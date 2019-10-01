@@ -31,5 +31,6 @@
                 android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
                 android:value="true" />
         </activity>
+        <service android:name=".tracking.service.PetTrackingService" />
     </application>
 </manifest>
