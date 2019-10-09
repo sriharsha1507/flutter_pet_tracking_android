@@ -1,10 +1,20 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  Future _invokeServiceInAndroid() async {
+    if (Platform.isAndroid) {
+      var methodChannel = MethodChannel("DeveloperGundaChannel");
+      String data = await methodChannel.invokeMethod("startPetTrackingService");
+      debugPrint(data);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,7 +29,9 @@ class MyApp extends StatelessWidget {
                 Text('Google maps'),
                 RaisedButton(
                   child: Text('Track my pet'),
-                  onPressed: () {},
+                  onPressed: () {
+                    _invokeServiceInAndroid();
+                  },
                 )
               ],
             ),
