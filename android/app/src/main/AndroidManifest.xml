@@ -8,7 +8,7 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name=".TrackingActivity"
+        android:name=".TrackingApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="flutter_android_pet_tracking_background_service"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">

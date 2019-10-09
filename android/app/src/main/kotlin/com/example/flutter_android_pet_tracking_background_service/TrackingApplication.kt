@@ -5,7 +5,7 @@ import com.example.flutter_android_pet_tracking_background_service.notification.
 import com.example.flutter_android_pet_tracking_background_service.utils.VersionChecker
 import io.flutter.app.FlutterApplication
 
-class TrackingActivity : FlutterApplication() {
+class TrackingApplication : FlutterApplication() {
     override fun onCreate() {
         super.onCreate()
 
