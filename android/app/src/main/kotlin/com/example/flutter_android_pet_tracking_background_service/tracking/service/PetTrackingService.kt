@@ -9,24 +9,27 @@ import com.example.flutter_android_pet_tracking_background_service.R
 import com.example.flutter_android_pet_tracking_background_service.utils.VersionChecker
 
 class PetTrackingService : Service(), TrackingService {
-    private lateinit var listener: PetTrackingListener
+    private var listener: PetTrackingListener? = null
 
     override fun onCreate() {
         super.onCreate()
-        startForegroundNotification()
+//        startForegroundNotification()
     }
 
     override fun onBind(intent: Intent): IBinder = LocalBinder()
 
     override fun start() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        startForegroundNotification()
+        for (i in 0..10){
+            listener?.testData("Index $i")
+        }
     }
 
     override fun stop() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        stopSelf()
     }
 
-    override fun attachListener(listener: PetTrackingListener) {
+    override fun attachListener(listener: PetTrackingListener?) {
         this.listener = listener
     }
 

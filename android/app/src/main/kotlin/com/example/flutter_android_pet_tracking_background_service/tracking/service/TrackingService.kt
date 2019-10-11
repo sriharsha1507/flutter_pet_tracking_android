@@ -3,5 +3,5 @@ package com.example.flutter_android_pet_tracking_background_service.tracking.ser
 interface TrackingService {
     fun start()
     fun stop()
-    fun attachListener(listener: PetTrackingListener)
+    fun attachListener(listener: PetTrackingListener?)
 }

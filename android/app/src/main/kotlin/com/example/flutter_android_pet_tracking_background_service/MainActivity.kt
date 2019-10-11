@@ -1,6 +1,7 @@
 package com.example.flutter_android_pet_tracking_background_service
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -19,8 +20,9 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 private const val METHOD_CHANNEL = "DeveloperGundaChannel"
 
 class MainActivity : FlutterActivity(), PetTrackingListener {
-    private lateinit var trackingService: TrackingService
+    private var trackingService: TrackingService? = null
     private lateinit var connection: ServiceConnection
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
@@ -32,13 +34,14 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         bindService(object : PetTrackingServiceHandler {
             override fun onBound() {
                 Log.e("SRI", "Bound Service")
-                trackingService.attachListener(this@MainActivity)
+                trackingService?.attachListener(this@MainActivity)
             }
         })
     }
 
     override fun onStop() {
         super.onStop()
+        trackingService?.attachListener(null)
         unbindService(connection)
     }
 
@@ -53,6 +56,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
     private fun bindService(serviceHandler: PetTrackingServiceHandler) {
         connection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
+                trackingService = null
             }
 
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -61,17 +65,13 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
                 serviceHandler.onBound()
             }
         }
+        val intent = Intent(this, PetTrackingService::class.java)
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
 
     private fun startPetTrackingService() {
-        val intent = Intent(this, PetTrackingService::class.java)
-
-        if (VersionChecker.isGreaterThanOrEqualToOreo()) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        trackingService?.start()
     }
 
     private fun setUpMethodChannelListener() {
