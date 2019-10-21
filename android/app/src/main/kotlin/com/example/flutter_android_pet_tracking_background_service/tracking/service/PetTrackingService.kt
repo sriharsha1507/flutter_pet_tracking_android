@@ -1,6 +1,7 @@
 package com.example.flutter_android_pet_tracking_background_service.tracking.service
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -10,11 +11,6 @@ import com.example.flutter_android_pet_tracking_background_service.utils.Version
 
 class PetTrackingService : Service(), TrackingService {
     private var listener: PetTrackingListener? = null
-
-    override fun onCreate() {
-        super.onCreate()
-//        startForegroundNotification()
-    }
 
     override fun onBind(intent: Intent): IBinder = LocalBinder()
 
@@ -26,6 +22,7 @@ class PetTrackingService : Service(), TrackingService {
     }
 
     override fun stop() {
+        stopForeground(true)
         stopSelf()
     }
 

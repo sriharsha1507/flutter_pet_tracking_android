@@ -15,7 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const platform = const MethodChannel(METHOD_CHANNEL);
+  static const methodChannel = const MethodChannel(METHOD_CHANNEL);
 
   @override
   void initState() {
@@ -40,6 +40,12 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     _invokeServiceInAndroid();
                   },
+                ),
+                RaisedButton(
+                  child: Text('Stop tracking my pet'),
+                  onPressed: () {
+                    _stopServiceInAndroid();
+                  },
                 )
               ],
             ),
@@ -52,8 +58,14 @@ class _MyAppState extends State<MyApp> {
 
   Future _invokeServiceInAndroid() async {
     if (Platform.isAndroid) {
-      var methodChannel = MethodChannel("DeveloperGundaChannel");
       String data = await methodChannel.invokeMethod("startPetTrackingService");
+      debugPrint(data);
+    }
+  }
+
+  Future _stopServiceInAndroid() async {
+    if (Platform.isAndroid) {
+      String data = await methodChannel.invokeMethod("stopPetTrackingService");
       debugPrint(data);
     }
   }
@@ -68,6 +80,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _setAndroidMethodCallHandler() {
-    platform.setMethodCallHandler(_androidMethodCallHandler);
+    methodChannel.setMethodCallHandler(_androidMethodCallHandler);
   }
 }

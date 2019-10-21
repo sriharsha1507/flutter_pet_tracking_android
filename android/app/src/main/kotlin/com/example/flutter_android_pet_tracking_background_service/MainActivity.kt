@@ -74,11 +74,18 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         trackingService?.start()
     }
 
+    private fun stopPetTrackingService() {
+        trackingService?.stop()
+    }
+
     private fun setUpMethodChannelListener() {
         MethodChannel(flutterView, METHOD_CHANNEL).setMethodCallHandler { methodCall, result ->
             if (methodCall.method == DartCall.START_PET_TRACKING) {
                 startPetTrackingService()
                 result.success("Yay!! Tracking Gunda Pet :) ")
+            } else if (methodCall.method == DartCall.STOP_PET_TRACKING) {
+                stopPetTrackingService()
+                result.success("Gunda pet tracking stopped :) ")
             }
         }
     }
