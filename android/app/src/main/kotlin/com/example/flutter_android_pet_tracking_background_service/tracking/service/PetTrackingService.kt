@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import com.example.flutter_android_pet_tracking_background_service.R
+import com.example.flutter_android_pet_tracking_background_service.tracking.model.PathLocation
 import com.example.flutter_android_pet_tracking_background_service.utils.VersionChecker
 
 private const val GPS_TRACKING_IN_MILLIS: Long = 1000
@@ -48,6 +49,7 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
 
     override fun onLocationChanged(location: Location) {
         Log.e("GUNDALOCATION", "latitude-${location.latitude} && longitude-${location.longitude}")
+        listener?.onNewLocation(PathLocation.fromLocation(location))
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

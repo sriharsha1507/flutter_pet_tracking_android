@@ -47,7 +47,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
     }
 
     override fun onNewLocation(location: PathLocation) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        invokePathLocation(location)
     }
 
     override fun testData(testData: String) {
@@ -101,6 +101,10 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
 
     private fun invokeMethod(testData: String) {
         MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.TEST_PET_TRACKING, testData)
+    }
+
+    private fun invokePathLocation(pathLocation: PathLocation) {
+        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.PATH_LOCATION, pathLocation.toString())
     }
 
     interface PetTrackingServiceHandler {

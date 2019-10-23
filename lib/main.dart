@@ -76,6 +76,10 @@ class _MyAppState extends State<MyApp> {
         var data = call.arguments;
         debugPrint("Call coming from Android native service listener $data");
         return Future.value(data);
+
+      case AndroidCall.PATH_LOCATION:
+        var pathLocation = call.arguments;
+        debugPrint("Dart Path location - $pathLocation");
     }
   }
 
