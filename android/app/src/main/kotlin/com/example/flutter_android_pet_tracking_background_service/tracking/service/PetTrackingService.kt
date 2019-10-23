@@ -11,7 +11,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Binder
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -88,11 +87,7 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
     }
 
     private fun initPetLocationTracking() {
-        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                } else {
-                    TODO("VERSION.SDK_INT < M")
-                }) return
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
         locationManager.requestLocationUpdates(
                 GPS_TRACKING_IN_MILLIS,
                 GPS_TRACKING_IN_DISTANCE_METERS,

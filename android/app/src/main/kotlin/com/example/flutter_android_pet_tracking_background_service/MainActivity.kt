@@ -1,9 +1,11 @@
 package com.example.flutter_android_pet_tracking_background_service
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -12,7 +14,6 @@ import com.example.flutter_android_pet_tracking_background_service.tracking.serv
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.PetTrackingService
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.TrackingService
 import com.example.flutter_android_pet_tracking_background_service.utils.DartCall
-import com.example.flutter_android_pet_tracking_background_service.utils.VersionChecker
 import io.flutter.app.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
@@ -71,7 +72,15 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
 
 
     private fun startPetTrackingService() {
-        trackingService?.start()
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    143)
+            return
+        } else {
+            trackingService?.start()
+        }
     }
 
     private fun stopPetTrackingService() {
