@@ -38,6 +38,7 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
     }
 
     override fun stop() {
+        stopPetLocationUpdates()
         stopForeground(true)
         stopSelf()
     }
@@ -98,6 +99,10 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
                 getLocationCriteria(),
                 this,
                 null)
+    }
+
+    private fun stopPetLocationUpdates() {
+        locationManager.removeUpdates(this)
     }
 
     inner class LocalBinder : Binder() {
