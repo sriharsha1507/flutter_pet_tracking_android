@@ -63,6 +63,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
             }
         }
         val intent = Intent(this, PetTrackingService::class.java)
+        startService(intent)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -83,20 +84,22 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         trackingService?.stop()
     }
 
+    private fun isTrackingPet() = trackingService?.isTracking()
+
     private fun setUpMethodChannelListener() {
         MethodChannel(flutterView, METHOD_CHANNEL).setMethodCallHandler { methodCall, result ->
-            if (methodCall.method == DartCall.START_PET_TRACKING) {
-                startPetTrackingService()
-                result.success("Yay!! Tracking Gunda Pet :) ")
-            } else if (methodCall.method == DartCall.STOP_PET_TRACKING) {
-                stopPetTrackingService()
-                result.success("Gunda pet tracking stopped :) ")
+            when {
+                methodCall.method == DartCall.START_PET_TRACKING -> {
+                    startPetTrackingService()
+                    result.success("Yay!! Tracking Gunda Pet :) ")
+                }
+                methodCall.method == DartCall.STOP_PET_TRACKING -> {
+                    stopPetTrackingService()
+                    result.success("Gunda pet tracking stopped :) ")
+                }
+                methodCall.method == DartCall.IS_PET_TRACKING_ENABLED -> result.success(isTrackingPet())
             }
         }
-    }
-
-    private fun invokeMethod(testData: String) {
-        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.TEST_PET_TRACKING, testData)
     }
 
     private fun invokePathLocation(pathLocation: PathLocation) {

@@ -23,6 +23,7 @@ private const val GPS_TRACKING_IN_DISTANCE_METERS: Float = 1f
 
 class PetTrackingService : Service(), TrackingService, LocationListener {
     private var listener: PetTrackingListener? = null
+    private var isTracking = false
     private lateinit var locationManager: LocationManager
 
     override fun onCreate() {
@@ -46,6 +47,8 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
     override fun attachListener(listener: PetTrackingListener?) {
         this.listener = listener
     }
+
+    override fun isTracking() = isTracking
 
     override fun onLocationChanged(location: Location) {
         Log.e("GUNDALOCATION", "latitude-${location.latitude} && longitude-${location.longitude}")
@@ -90,6 +93,7 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
 
     private fun initPetLocationTracking() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
+        isTracking = true
         locationManager.requestLocationUpdates(
                 GPS_TRACKING_IN_MILLIS,
                 GPS_TRACKING_IN_DISTANCE_METERS,
@@ -99,6 +103,7 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
     }
 
     private fun stopPetLocationUpdates() {
+        isTracking = false
         locationManager.removeUpdates(this)
     }
 

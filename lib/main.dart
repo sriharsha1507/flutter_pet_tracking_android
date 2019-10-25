@@ -16,11 +16,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   static const methodChannel = const MethodChannel(METHOD_CHANNEL);
+  bool isTrackingEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _setAndroidMethodCallHandler();
+    _isPetTrackingEnabled();
   }
 
   @override
@@ -70,11 +72,20 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future _isPetTrackingEnabled() async {
+    if (Platform.isAndroid) {
+      isTrackingEnabled =
+          await methodChannel.invokeMethod("isPetTrackingEnabled");
+      debugPrint("Pet Tracking Status - $isTrackingEnabled");
+    }
+  }
+
   Future<dynamic> _androidMethodCallHandler(MethodCall call) async {
     switch (call.method) {
       case AndroidCall.PATH_LOCATION:
         var pathLocation = call.arguments;
         debugPrint("Dart Path location - $pathLocation");
+        break;
     }
   }
 
