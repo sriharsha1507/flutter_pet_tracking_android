@@ -4,5 +4,4 @@ import com.example.flutter_android_pet_tracking_background_service.tracking.mode
 
 interface PetTrackingListener {
     fun onNewLocation(location: PathLocation)
-    fun testData(testData: String)
 }

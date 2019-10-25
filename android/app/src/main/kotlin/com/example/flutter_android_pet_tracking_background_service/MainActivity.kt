@@ -50,10 +50,6 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         invokePathLocation(location)
     }
 
-    override fun testData(testData: String) {
-        invokeMethod(testData)
-    }
-
     private fun bindService(serviceHandler: PetTrackingServiceHandler) {
         connection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
