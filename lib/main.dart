@@ -37,18 +37,19 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text('Google maps'),
-                RaisedButton(
-                  child: Text('Track my pet'),
-                  onPressed: () {
-                    _invokeServiceInAndroid();
-                  },
-                ),
-                RaisedButton(
-                  child: Text('Stop tracking my pet'),
-                  onPressed: () {
-                    _stopServiceInAndroid();
-                  },
-                )
+                !isTrackingEnabled
+                    ? RaisedButton(
+                        child: Text('Track my pet'),
+                        onPressed: () {
+                          _invokeServiceInAndroid();
+                        },
+                      )
+                    : RaisedButton(
+                        child: Text('Stop tracking my pet'),
+                        onPressed: () {
+                          _stopServiceInAndroid();
+                        },
+                      )
               ],
             ),
           ),
@@ -61,6 +62,9 @@ class _MyAppState extends State<MyApp> {
   Future _invokeServiceInAndroid() async {
     if (Platform.isAndroid) {
       String data = await methodChannel.invokeMethod("startPetTrackingService");
+      setState(() {
+        isTrackingEnabled = true;
+      });
       debugPrint(data);
     }
   }
@@ -68,6 +72,9 @@ class _MyAppState extends State<MyApp> {
   Future _stopServiceInAndroid() async {
     if (Platform.isAndroid) {
       String data = await methodChannel.invokeMethod("stopPetTrackingService");
+      setState(() {
+        isTrackingEnabled = false;
+      });
       debugPrint(data);
     }
   }
