@@ -72,11 +72,6 @@ class _MyAppState extends State<MyApp> {
 
   Future<dynamic> _androidMethodCallHandler(MethodCall call) async {
     switch (call.method) {
-      case AndroidCall.TEST_PET_TRACKING:
-        var data = call.arguments;
-        debugPrint("Call coming from Android native service listener $data");
-        return Future.value(data);
-
       case AndroidCall.PATH_LOCATION:
         var pathLocation = call.arguments;
         debugPrint("Dart Path location - $pathLocation");
