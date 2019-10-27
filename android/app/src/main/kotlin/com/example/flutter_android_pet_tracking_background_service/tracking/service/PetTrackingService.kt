@@ -18,7 +18,7 @@ import com.example.flutter_android_pet_tracking_background_service.R
 import com.example.flutter_android_pet_tracking_background_service.tracking.model.PathLocation
 import com.example.flutter_android_pet_tracking_background_service.utils.VersionChecker
 
-private const val GPS_TRACKING_IN_MILLIS: Long = 1000
+private const val GPS_TRACKING_IN_MILLIS: Long = 0
 private const val GPS_TRACKING_IN_DISTANCE_METERS: Float = 1f
 
 class PetTrackingService : Service(), TrackingService, LocationListener {

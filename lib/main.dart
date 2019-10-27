@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_android_pet_tracking_background_service/utils/AndroidCall.dart';
+import 'package:flutter_android_pet_tracking_background_service/utils/LatLngWrapper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 const String METHOD_CHANNEL = "DeveloperGundaChannel";
@@ -18,6 +20,8 @@ class _MyAppState extends State<MyApp> {
   static const methodChannel = const MethodChannel(METHOD_CHANNEL);
   bool isTrackingEnabled = false;
   bool isServiceBounded = false;
+  List<LatLng> latLngList = [];
+  final Set<Polyline> _polylines = {};
 
   GoogleMapController googleMapController;
 
@@ -54,8 +58,11 @@ class _MyAppState extends State<MyApp> {
               child: GoogleMap(
                 onMapCreated: _onMapCreated,
                 myLocationEnabled: true,
+                myLocationButtonEnabled: true,
                 initialCameraPosition:
                     CameraPosition(target: _center, zoom: 11.0),
+                polylines: _polylines,
+                compassEnabled: true,
               ),
             ),
             !isTrackingEnabled
@@ -127,8 +134,20 @@ class _MyAppState extends State<MyApp> {
   Future<dynamic> _androidMethodCallHandler(MethodCall call) async {
     switch (call.method) {
       case AndroidCall.PATH_LOCATION:
-        var pathLocation = call.arguments;
-        debugPrint("Dart Path location - $pathLocation");
+        var pathLocation = jsonDecode(call.arguments);
+        LatLng latLng = LatLngWrapper.fromAndroidJson(pathLocation);
+        latLngList.add(latLng);
+        if (latLngList.isNotEmpty) {
+          setState(() {
+            _polylines.add(Polyline(
+              polylineId: PolylineId(latLngList.first.toString()),
+              visible: true,
+              points: latLngList,
+              color: Colors.red,
+            ));
+          });
+        }
+        debugPrint("Wrapper here --> $latLng");
         break;
 
       case AndroidCall.IS_PET_TRACKING_ENABLED:

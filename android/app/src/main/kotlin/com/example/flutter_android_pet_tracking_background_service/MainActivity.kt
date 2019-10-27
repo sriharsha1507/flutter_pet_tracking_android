@@ -77,10 +77,11 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
 
 
     private fun startPetTrackingService() {
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        if ((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)&& checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
                     143)
             return
         } else {
