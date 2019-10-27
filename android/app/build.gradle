@@ -45,6 +45,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: getGoogleMapsApiKey()]
     }
 
     buildTypes {
@@ -54,6 +55,12 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+}
+
+def getGoogleMapsApiKey() {
+    def Properties props = new Properties()
+    props.load(new FileInputStream(new File('secret.properties')))
+    return props['GOOGLE_MAPS_API_KEY']
 }
 
 flutter {
