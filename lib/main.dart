@@ -53,6 +53,7 @@ class _MyAppState extends State<MyApp> {
               height: 500,
               child: GoogleMap(
                 onMapCreated: _onMapCreated,
+                myLocationEnabled: true,
                 initialCameraPosition:
                     CameraPosition(target: _center, zoom: 11.0),
               ),
