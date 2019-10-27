@@ -39,6 +39,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
                 Log.e("SRI", "Bound Service")
                 trackingService?.attachListener(this@MainActivity)
                 serviceBound = true
+                invokeBoundServiceStatus()
             }
         })
     }
@@ -49,7 +50,6 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
             it.attachListener(null)
             unbindService(connection)
             serviceBound = false
-            invokeBoundServiceStatus()
         }
     }
 
