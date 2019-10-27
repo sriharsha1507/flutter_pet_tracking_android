@@ -9,8 +9,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import com.example.flutter_android_pet_tracking_background_service.notification.service.NotificationChannelService
 import com.example.flutter_android_pet_tracking_background_service.tracking.model.PathLocation
+import com.example.flutter_android_pet_tracking_background_service.tracking.model.toJson
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.PetTrackingListener
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.PetTrackingService
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.TrackingService
@@ -54,7 +54,9 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
     }
 
     override fun onNewLocation(location: PathLocation) {
-        invokePathLocation(location)
+        location.toJson()?.let {
+            invokePathLocation(it)
+        }
     }
 
     private fun bindService(serviceHandler: PetTrackingServiceHandler) {
@@ -113,12 +115,8 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         }
     }
 
-    private fun invokePathLocation(pathLocation: PathLocation) {
-        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.PATH_LOCATION, pathLocation.toString())
-    }
-
-    private fun invokePetTrackingStatus(status: Boolean) {
-        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.IS_PET_TRACKING_ENABLED, status)
+    private fun invokePathLocation(pathLocation: String) {
+        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.PATH_LOCATION, pathLocation)
     }
 
     private fun invokeBoundServiceStatus() {
