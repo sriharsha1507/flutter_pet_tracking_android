@@ -23,7 +23,7 @@ private const val GPS_TRACKING_IN_DISTANCE_METERS: Float = 1f
 
 class PetTrackingService : Service(), TrackingService, LocationListener {
     private var listener: PetTrackingListener? = null
-    private var isTracking = false
+    private var isTracking: Boolean = false
     private lateinit var locationManager: LocationManager
 
     override fun onCreate() {

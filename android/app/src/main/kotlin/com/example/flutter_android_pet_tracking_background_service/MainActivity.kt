@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import com.example.flutter_android_pet_tracking_background_service.notification.service.NotificationChannelService
 import com.example.flutter_android_pet_tracking_background_service.tracking.model.PathLocation
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.PetTrackingListener
 import com.example.flutter_android_pet_tracking_background_service.tracking.service.PetTrackingService
@@ -23,6 +24,7 @@ private const val METHOD_CHANNEL = "DeveloperGundaChannel"
 class MainActivity : FlutterActivity(), PetTrackingListener {
     private var trackingService: TrackingService? = null
     private lateinit var connection: ServiceConnection
+    private var serviceBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,20 +32,25 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         setUpMethodChannelListener()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         bindService(object : PetTrackingServiceHandler {
             override fun onBound() {
                 Log.e("SRI", "Bound Service")
                 trackingService?.attachListener(this@MainActivity)
+                serviceBound = true
             }
         })
     }
 
     override fun onStop() {
         super.onStop()
-        trackingService?.attachListener(null)
-        unbindService(connection)
+        trackingService?.let {
+            it.attachListener(null)
+            unbindService(connection)
+            serviceBound = false
+            invokeBoundServiceStatus()
+        }
     }
 
     override fun onNewLocation(location: PathLocation) {
@@ -63,7 +70,6 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
             }
         }
         val intent = Intent(this, PetTrackingService::class.java)
-        startService(intent)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -76,6 +82,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
                     143)
             return
         } else {
+            startService(Intent(this, PetTrackingService::class.java))
             trackingService?.start()
         }
     }
@@ -84,7 +91,10 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
         trackingService?.stop()
     }
 
-    private fun isTrackingPet() = trackingService?.isTracking()
+    private fun isTrackingPet(): Boolean {
+        val service = trackingService
+        return service?.isTracking() ?: false
+    }
 
     private fun setUpMethodChannelListener() {
         MethodChannel(flutterView, METHOD_CHANNEL).setMethodCallHandler { methodCall, result ->
@@ -98,12 +108,21 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
                     result.success("Gunda pet tracking stopped :) ")
                 }
                 methodCall.method == DartCall.IS_PET_TRACKING_ENABLED -> result.success(isTrackingPet())
+                methodCall.method == DartCall.SERVICE_BOUND -> result.success(serviceBound)
             }
         }
     }
 
     private fun invokePathLocation(pathLocation: PathLocation) {
         MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.PATH_LOCATION, pathLocation.toString())
+    }
+
+    private fun invokePetTrackingStatus(status: Boolean) {
+        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.IS_PET_TRACKING_ENABLED, status)
+    }
+
+    private fun invokeBoundServiceStatus() {
+        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.SERVICE_BOUND, true)
     }
 
     interface PetTrackingServiceHandler {

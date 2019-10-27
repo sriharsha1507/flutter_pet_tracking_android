@@ -17,12 +17,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   static const methodChannel = const MethodChannel(METHOD_CHANNEL);
   bool isTrackingEnabled = false;
+  bool isServiceBounded = false;
 
   @override
   void initState() {
     super.initState();
     _setAndroidMethodCallHandler();
-    _isPetTrackingEnabled();
+    _isServiceBound();
   }
 
   @override
@@ -30,32 +31,37 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Background Service',
       home: Scaffold(
-        body: Center(
-          heightFactor: 50,
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text('Google maps'),
-                !isTrackingEnabled
-                    ? RaisedButton(
-                        child: Text('Track my pet'),
-                        onPressed: () {
-                          _invokeServiceInAndroid();
-                        },
-                      )
-                    : RaisedButton(
-                        child: Text('Stop tracking my pet'),
-                        onPressed: () {
-                          _stopServiceInAndroid();
-                        },
-                      )
-              ],
-            ),
-          ),
+          body: !isServiceBounded
+              ? CircularProgressIndicator()
+              : getInitialWidget()),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+
+  Center getInitialWidget() {
+    return Center(
+      heightFactor: 50,
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('Google maps'),
+            !isTrackingEnabled
+                ? RaisedButton(
+                    child: Text('Track my pet'),
+                    onPressed: () {
+                      _invokeServiceInAndroid();
+                    },
+                  )
+                : RaisedButton(
+                    child: Text('Stop tracking my pet'),
+                    onPressed: () {
+                      _stopServiceInAndroid();
+                    },
+                  )
+          ],
         ),
       ),
-      debugShowCheckedModeBanner: false,
     );
   }
 
@@ -81,8 +87,23 @@ class _MyAppState extends State<MyApp> {
 
   Future _isPetTrackingEnabled() async {
     if (Platform.isAndroid) {
-      isTrackingEnabled =
-          await methodChannel.invokeMethod("isPetTrackingEnabled");
+      bool result = await methodChannel.invokeMethod("isPetTrackingEnabled");
+      setState(() {
+        isTrackingEnabled = result;
+      });
+      debugPrint("Pet Tracking Status - $isTrackingEnabled");
+    }
+  }
+
+  Future _isServiceBound() async {
+    if (Platform.isAndroid) {
+      bool result = await methodChannel.invokeMethod("serviceBound");
+      setState(() {
+        isServiceBounded = result;
+        if (isServiceBounded) {
+          _isPetTrackingEnabled();
+        }
+      });
       debugPrint("Pet Tracking Status - $isTrackingEnabled");
     }
   }
@@ -92,6 +113,26 @@ class _MyAppState extends State<MyApp> {
       case AndroidCall.PATH_LOCATION:
         var pathLocation = call.arguments;
         debugPrint("Dart Path location - $pathLocation");
+        break;
+
+      case AndroidCall.IS_PET_TRACKING_ENABLED:
+        bool enabled = call.arguments;
+        debugPrint("Tracking service bounded and status - $enabled");
+        setState(() {
+          isTrackingEnabled = enabled;
+          debugPrint("From Android it is invoked");
+        });
+        break;
+
+      case AndroidCall.SERVICE_BOUND:
+        bool result = call.arguments;
+        debugPrint("Service bounded on dart side - $result");
+        setState(() {
+          isServiceBounded = result;
+          if (isServiceBounded) {
+            _isPetTrackingEnabled();
+          }
+        });
         break;
     }
   }
