@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_android_pet_tracking_background_service/utils/AndroidCall.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 const String METHOD_CHANNEL = "DeveloperGundaChannel";
 
@@ -19,6 +19,10 @@ class _MyAppState extends State<MyApp> {
   bool isTrackingEnabled = false;
   bool isServiceBounded = false;
 
+  GoogleMapController googleMapController;
+
+  final LatLng _center = const LatLng(45.521563, -122.677433);
+
   @override
   void initState() {
     super.initState();
@@ -33,19 +37,26 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
           body: !isServiceBounded
               ? CircularProgressIndicator()
-              : getInitialWidget()),
+              : getInitialWidget(context)),
       debugShowCheckedModeBanner: false,
     );
   }
 
-  Center getInitialWidget() {
+  Center getInitialWidget(BuildContext context) {
     return Center(
       heightFactor: 50,
       child: Container(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Google maps'),
+            Container(
+              height: 500,
+              child: GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition:
+                    CameraPosition(target: _center, zoom: 11.0),
+              ),
+            ),
             !isTrackingEnabled
                 ? RaisedButton(
                     child: Text('Track my pet'),
@@ -63,6 +74,10 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  void _onMapCreated(GoogleMapController googleMapController) {
+    this.googleMapController = googleMapController;
   }
 
   Future _invokeServiceInAndroid() async {
