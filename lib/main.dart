@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_android_pet_tracking_background_service/communication/android_communication.dart';
 import 'package:flutter_android_pet_tracking_background_service/utils/AndroidCall.dart';
 import 'package:flutter_android_pet_tracking_background_service/utils/LatLngWrapper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -22,6 +23,7 @@ class _MyAppState extends State<MyApp> {
   bool isServiceBounded = false;
   List<LatLng> latLngList = [];
   final Set<Polyline> _polylines = {};
+  AndroidCommunication androidCommunication = AndroidCommunication();
 
   GoogleMapController googleMapController;
 
@@ -88,24 +90,20 @@ class _MyAppState extends State<MyApp> {
     this.googleMapController = googleMapController;
   }
 
-  Future _invokeServiceInAndroid() async {
-    if (Platform.isAndroid) {
-      String data = await methodChannel.invokeMethod("startPetTrackingService");
+  void _invokeServiceInAndroid() {
+    androidCommunication.invokeServiceInAndroid().then((onValue) {
       setState(() {
         isTrackingEnabled = true;
       });
-      debugPrint(data);
-    }
+    });
   }
 
-  Future _stopServiceInAndroid() async {
-    if (Platform.isAndroid) {
-      String data = await methodChannel.invokeMethod("stopPetTrackingService");
+  void _stopServiceInAndroid() {
+    androidCommunication.stopServiceInAndroid().then((onValue) {
       setState(() {
         isTrackingEnabled = false;
       });
-      debugPrint(data);
-    }
+    });
   }
 
   Future _isPetTrackingEnabled() async {
