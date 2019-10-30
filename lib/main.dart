@@ -120,7 +120,9 @@ class _MyAppState extends State<MyApp> {
 
   Future _isServiceBound() async {
     if (Platform.isAndroid) {
+      debugPrint("ServiceBound Called from init");
       bool result = await methodChannel.invokeMethod("serviceBound");
+      debugPrint("Result from ServiceBound call - $result");
       setState(() {
         isServiceBounded = result;
         if (isServiceBounded) {
@@ -148,26 +150,6 @@ class _MyAppState extends State<MyApp> {
           });
         }
         debugPrint("Wrapper here --> $latLng");
-        break;
-
-      case AndroidCall.IS_PET_TRACKING_ENABLED:
-        bool enabled = call.arguments;
-        debugPrint("Tracking service bounded and status - $enabled");
-        setState(() {
-          isTrackingEnabled = enabled;
-          debugPrint("From Android it is invoked");
-        });
-        break;
-
-      case AndroidCall.SERVICE_BOUND:
-        bool result = call.arguments;
-        debugPrint("Service bounded on dart side - $result");
-        setState(() {
-          isServiceBounded = result;
-          if (isServiceBounded) {
-            _isPetTrackingEnabled();
-          }
-        });
         break;
     }
   }

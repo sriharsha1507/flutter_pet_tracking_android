@@ -25,6 +25,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
     private var trackingService: TrackingService? = null
     private lateinit var connection: ServiceConnection
     private var serviceBound = false
+    private var serviceBoundResult: MethodChannel.Result? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +40,10 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
                 Log.e("SRI", "Bound Service")
                 trackingService?.attachListener(this@MainActivity)
                 serviceBound = true
-                invokeBoundServiceStatus()
+                serviceBoundResult?.let {
+                    it.success(true)
+                    serviceBoundResult = null
+                }
             }
         })
     }
@@ -78,7 +82,7 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
 
     private fun startPetTrackingService() {
         if ((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)&& checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
@@ -111,17 +115,19 @@ class MainActivity : FlutterActivity(), PetTrackingListener {
                     result.success("Gunda pet tracking stopped :) ")
                 }
                 methodCall.method == DartCall.IS_PET_TRACKING_ENABLED -> result.success(isTrackingPet())
-                methodCall.method == DartCall.SERVICE_BOUND -> result.success(serviceBound)
+                methodCall.method == DartCall.SERVICE_BOUND -> {
+                    if (trackingService != null) {
+                        result.success(serviceBound)
+                        return@setMethodCallHandler
+                    }
+                    serviceBoundResult = result
+                }
             }
         }
     }
 
     private fun invokePathLocation(pathLocation: String) {
         MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.PATH_LOCATION, pathLocation)
-    }
-
-    private fun invokeBoundServiceStatus() {
-        MethodChannel(flutterView, METHOD_CHANNEL).invokeMethod(DartCall.SERVICE_BOUND, true)
     }
 
     interface PetTrackingServiceHandler {
