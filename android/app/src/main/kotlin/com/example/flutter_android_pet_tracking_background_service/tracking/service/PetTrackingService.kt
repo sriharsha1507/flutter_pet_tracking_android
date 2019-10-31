@@ -2,6 +2,7 @@ package com.example.flutter_android_pet_tracking_background_service.tracking.ser
 
 import android.Manifest
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -53,6 +54,7 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
     override fun onLocationChanged(location: Location) {
         Log.e("GUNDALOCATION", "latitude-${location.latitude} && longitude-${location.longitude}")
         listener?.onNewLocation(PathLocation.fromLocation(location))
+        updateNotification(PathLocation.fromLocation(location).toString())
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -105,6 +107,18 @@ class PetTrackingService : Service(), TrackingService, LocationListener {
     private fun stopPetLocationUpdates() {
         isTracking = false
         locationManager.removeUpdates(this)
+    }
+
+    private fun updateNotification(location: String) {
+        if (VersionChecker.isGreaterThanOrEqualToOreo()) {
+            var notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val builder: Notification.Builder =
+                    Notification.Builder(this, "sriharsha")
+                            .setContentText(location)
+                            .setContentTitle("Current Location")
+                            .setSmallIcon(R.drawable.launch_background)
+            notificationManager.notify(143, builder.build())
+        }
     }
 
     inner class LocalBinder : Binder() {

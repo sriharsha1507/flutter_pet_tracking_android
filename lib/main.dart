@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
 
   GoogleMapController googleMapController;
 
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  LatLng _center = const LatLng(45.521563, -122.677433);
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
                 initialCameraPosition:
-                    CameraPosition(target: _center, zoom: 11.0),
+                    CameraPosition(target: _center, zoom: 2.0),
                 polylines: _polylines,
                 compassEnabled: true,
               ),
@@ -139,12 +139,20 @@ class _MyAppState extends State<MyApp> {
         latLngList.add(latLng);
         if (latLngList.isNotEmpty) {
           setState(() {
+            if (latLngList.length > 2) {
+              var bounds = LatLngBounds(
+                  southwest: latLngList.first, northeast: latLngList.last);
+              var cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 25.0);
+              googleMapController.animateCamera(cameraUpdate);
+            }
             _polylines.add(Polyline(
               polylineId: PolylineId(latLngList.first.toString()),
               visible: true,
               points: latLngList,
-              color: Colors.red,
+              color: Colors.green,
+              width: 2,
             ));
+            _center = latLngList.last;
           });
         }
         debugPrint("Wrapper here --> $latLng");
